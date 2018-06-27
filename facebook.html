@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Facebook API</title>
+  <style>
+    #fb-btn, #logout {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<!-- APIs will be available and un-modified in that version for at least 2 years !!!!! -->
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '208448259778714',   // the app id
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.10'    // the graph api version in this case v2.10
+    });
+  
+  FB.getLoginStatus(function(response) {    // added additionaly and deleted FB.APPEvents.log...
+          statusChangeCallback(response);
+      });
+      
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+
+  function statusChangeCallback(response) {       // also added additionaly here
+       if (response.status === "connected") {     // this function checks the status!
+           console.log("Logged in and authenticated");
+           setElements(true);             // setElements lines added after setElements function
+           graphAPI();    //the graph func.
+       } else {
+           console.log("Not authenticated");
+           setElements(false);
+       }
+   }
+
+   function checkLoginState() {                   // function for the button
+          FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+          });
+   }
+
+   function setElements(isLoggedIn) {            // create a function that will set element depending on the user’s login status
+      if(isLoggedIn){
+        document.getElementById('fb-btn').style.display = 'none';
+        document.getElementById('logout').style.display = 'block';
+      } else {
+        document.getElementById('fb-btn').style.display = 'block';
+        document.getElementById('logout').style.display = 'none';
+      }
+   }
+
+   function logout() {          // logout function
+        FB.logout(function(response){
+          setElements(false);
+        });
+   }
+
+   function graphAPI() {       // to get information from our profile using graph
+        FB.api("me?fields=id,name,email" ,   // correct ?
+    function(response){
+          if(response && !response.error){
+            console.log(response);
+          }
+        });
+   }
+</script>
+<!-- create button to authenticate the user! 
+  & hide login button after logged in/ logged out -> set id and css -->
+<fb:login-button                    
+  id = "fb-btn"                        
+  scope = "public_profile, email"
+  onlogin = "checkLoginState();">
+</fb:login-button>
+
+<!-- the way out - logout -->
+<a id = "logout" onclick = "logout()" href = "#">Logout</a>
+
+</body>
+</html>
